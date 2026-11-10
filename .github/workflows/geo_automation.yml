@@ -1,0 +1,30 @@
+name: Pulamanthole Autonomous GEO & Publishing Pipeline
+
+on:
+  schedule:
+    - cron: '30 3 * * *' # Daily at 09:00 AM IST (03:30 UTC)
+  workflow_dispatch:
+
+jobs:
+  run-geo-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install requests pandas Pillow beautifulsoup4
+
+      - name: Execute Automated 10-Block Carousel Render & Social Post
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          GBP_API_KEY: ${{ secrets.GBP_API_KEY }}
+        run: python scripts/publish_daily_content.py
+
+      - name: Run AI Crawler & Log Parser Audit
+        run: python scripts/ai_crawler_audit.py
